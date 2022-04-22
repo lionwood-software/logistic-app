@@ -1,0 +1,6 @@
+@mixin transparent-background($color, $alpha,) {
+  background-color: rgba(red($color), green($color), blue($color), $alpha);
+}
+@mixin card {
+  box-shadow: 0 2px 24px 0 #0000000A;
+}

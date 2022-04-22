@@ -1,0 +1,70 @@
+image: docker:20.10.13
+
+default:
+  before_script:
+    - docker info
+
+services:
+  - name: docker:20.10.13-dind
+    entrypoint: [ "env", "-u", "DOCKER_HOST" ]
+    command: [ "dockerd-entrypoint.sh" ]
+
+stages:
+  - "test"
+  - "build"
+  - "deploy"
+
+build staging image:
+  stage: build
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  only:
+    - stage
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
+    - IMAGE_VERSION_TAG=staging
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+  script:
+    - docker pull $DOCKER_REGISTRY/$APP_NAME:$IMAGE_VERSION_TAG || true
+    - >
+      docker build --pull
+      --cache-from $DOCKER_REGISTRY/$APP_NAME:$IMAGE_VERSION_TAG
+      -f Backend.Dockerfile
+      -t $DOCKER_REGISTRY/$APP_NAME:$IMAGE_VERSION_TAG .
+    - docker push --all-tags $DOCKER_REGISTRY/$APP_NAME
+
+deploy staging:
+  stage: deploy
+  only:
+    - stage
+  script:
+    - echo "Test!"
+
+build production image:
+  stage: build
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v(\d+)\.(\d+)\.(\d+)$/ && $CI_COMMIT_BRANCH =~ "master"
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
+    - IMAGE_VERSION_TAG=$(echo $CI_COMMIT_TAG | grep -E -o '([0-9]+\.){2}[0-9]+')
+  script:
+    - docker build -f Backend.Dockerfile -t $DOCKER_REGISTRY/$APP_NAME:$IMAGE_VERSION_TAG -t $DOCKER_REGISTRY/$APP_NAME:latest .
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+    - docker push --all-tags $DOCKER_REGISTRY/$APP_NAME
+
+deploy production:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v(\d+)\.(\d+)\.(\d+)$/ && $CI_COMMIT_BRANCH =~ "master"
+      when: manual
+  script:
+      - echo "Works!"
+

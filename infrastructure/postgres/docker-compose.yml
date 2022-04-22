@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  pgsql:
+    shm_size: 4gb
+    build:
+      context: .
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - DEFAULT_DATABASE_USER_NAME=${DEFAULT_DATABASE_USER_NAME}
+      - DEFAULT_DATABASE_USER_PASSWORD=${DEFAULT_DATABASE_USER_PASSWORD}
+      - DEFAULT_DATABASE_NAME=${DEFAULT_DATABASE_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./dumps:/var/dumps_pgsql
+volumes:
+  pgdata:

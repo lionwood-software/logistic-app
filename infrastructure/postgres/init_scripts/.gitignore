@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# Except all needed files
+!.gitignore
+!1_init_db_config.sh
+!2_create_role_restore_db.sh

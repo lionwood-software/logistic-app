@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+
+  button {
+    border: 0;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus {
+    outline: none;
+  }
+
+  ul {
+    padding-inline-start: 0;
+  }
+
+  a { text-decoration: none; }
+}
