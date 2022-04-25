@@ -38,5 +38,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 # Credits
 
 [Lionwood.software](https://lionwood.software/) - hr@lionwood.software, sales@lionwood.software
-
-Project Link: [https://nit.school/](https://github.com/your_username/repo_name)
